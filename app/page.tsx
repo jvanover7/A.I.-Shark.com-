@@ -6,7 +6,7 @@ const MAILTO = `mailto:${EMAIL}?subject=AI%20consulting%20inquiry`;
 const CAPABILITIES = [
   {
     title: "AI Strategy",
-    body: "Identify where AI compounds your margin — not where it’s trendy.",
+    body: "We map where AI compounds your margin — not where it’s trendy.",
   },
   {
     title: "Custom Automations",
@@ -24,7 +24,7 @@ export default function HomePage() {
       <div className="pointer-events-none absolute inset-0 grid-bg" aria-hidden="true" />
 
       {/* Top nav */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-6 md:px-12 md:py-8 rise rise-1">
+      <header className="rise rise-1 relative z-10 flex items-center justify-between px-6 py-6 md:px-12 md:py-8">
         <Wordmark />
         <a
           href={MAILTO}
@@ -35,9 +35,28 @@ export default function HomePage() {
       </header>
 
       {/* Hero */}
-      <section className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 pb-24 pt-12 text-center md:pb-32 md:pt-20">
+      <section className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 pb-24 pt-8 text-center md:pb-32 md:pt-12">
+        {/* App-icon-style hero mark */}
+        <div className="rise rise-2 relative my-2 md:my-4">
+          <div
+            className="glass relative grid place-items-center"
+            style={{
+              width: 132,
+              height: 132,
+              borderRadius: 30,
+            }}
+          >
+            <SharkMark size={92} />
+          </div>
+          {/* Soft ground glow */}
+          <div
+            className="pointer-events-none absolute left-1/2 top-full h-12 w-40 -translate-x-1/2 rounded-[50%] blur-2xl"
+            style={{ background: "radial-gradient(ellipse, rgba(34,224,255,0.35), transparent 70%)" }}
+          />
+        </div>
+
         {/* Eyebrow glass pill */}
-        <div className="glass rise rise-2 mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.28em] text-cyan-edge">
+        <div className="glass rise rise-3 mt-10 inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.28em] text-cyan-edge">
           <span className="relative h-1.5 w-1.5 rounded-full bg-cyan-glow">
             <span className="absolute inset-0 animate-ping rounded-full bg-cyan-glow opacity-70" />
           </span>
@@ -45,27 +64,22 @@ export default function HomePage() {
         </div>
 
         {/* Headline */}
-        <h1 className="rise rise-3 max-w-4xl text-balance text-4xl font-semibold leading-[1.04] tracking-[-0.02em] sm:text-5xl md:text-7xl">
+        <h1 className="rise rise-4 mt-8 max-w-4xl text-balance text-4xl font-semibold leading-[1.04] tracking-[-0.022em] sm:text-5xl md:text-7xl">
           <span className="text-gradient">Hunt the future</span>
           <br />
           <span className="text-white">before it hunts you.</span>
         </h1>
 
         {/* Subheadline */}
-        <p className="rise rise-4 mt-7 max-w-2xl text-balance text-base leading-relaxed text-steel md:text-lg">
+        <p className="rise rise-5 mt-7 max-w-2xl text-balance text-base leading-relaxed text-steel md:text-lg">
           AI Shark is an AI consulting firm that builds the custom automations
           and intelligent systems your competitors haven&rsquo;t thought of yet.
           We come in, map your operation, and deploy AI that compounds ROI — so
           the next generation of upstarts can&rsquo;t outrun you.
         </p>
 
-        {/* Floating shark mark */}
-        <div className="my-12 animate-float rise rise-4">
-          <SharkMark size={144} />
-        </div>
-
         {/* CTA */}
-        <div className="rise rise-5 flex flex-col items-center gap-4 sm:flex-row">
+        <div className="rise rise-5 mt-10 flex flex-col items-center gap-4 sm:flex-row">
           <a
             href={MAILTO}
             className="glass-cta rounded-full px-8 py-4 font-mono text-xs font-medium uppercase tracking-[0.22em] text-white"
