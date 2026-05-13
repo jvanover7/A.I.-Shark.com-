@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #02060f;
+  color: #e6f1ff;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(34, 224, 255, 0.18), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 110%, rgba(34, 224, 255, 0.08), transparent 60%),
+    linear-gradient(180deg, #02060f 0%, #040b1c 60%, #02060f 100%);
+  min-height: 100vh;
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(34, 224, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 224, 255, 0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 80%);
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, #ffffff 0%, #5cf2ff 50%, #22e0ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% auto;
+  animation: shimmer 6s linear infinite;
+}
+
+.cta-glow {
+  box-shadow:
+    0 0 0 1px rgba(92, 242, 255, 0.5) inset,
+    0 0 24px rgba(34, 224, 255, 0.35),
+    0 0 60px rgba(34, 224, 255, 0.18);
+}
+
+.cta-glow:hover {
+  box-shadow:
+    0 0 0 1px rgba(92, 242, 255, 0.9) inset,
+    0 0 32px rgba(34, 224, 255, 0.6),
+    0 0 80px rgba(34, 224, 255, 0.3);
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
