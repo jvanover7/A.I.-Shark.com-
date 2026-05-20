@@ -33,3 +33,7 @@ Visit http://localhost:3000.
 - **Palette:** Deep ocean (`#02060f` / `#040b1c`) with electric cyan (`#22e0ff` / `#5cf2ff`) accents.
 - **Mark:** Custom SVG shark silhouette with circuit accents — lives in `components/Logo.tsx` and `app/icon.svg`.
 - **Contact:** `theaishark@theaishark.com`
+
+## Tools
+
+- `tools/get-shit-done/` — vendored snapshot of the [GSD (Get Shit Done)](https://github.com/gsd-build/get-shit-done) Claude Code skill system (MIT). See `tools/get-shit-done/INSTALL-LOCAL.md` for install + the six-command core loop.
