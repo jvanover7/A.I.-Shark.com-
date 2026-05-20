@@ -36,4 +36,9 @@ Visit http://localhost:3000.
 
 ## Tools
 
-- `tools/get-shit-done/` — vendored snapshot of the [GSD (Get Shit Done)](https://github.com/gsd-build/get-shit-done) Claude Code skill system (MIT). See `tools/get-shit-done/INSTALL-LOCAL.md` for install + the six-command core loop.
+Vendored Claude Code skills/plugins live under `tools/` — see `tools/README.md` for the full table. Snapshots include:
+
+- `tools/get-shit-done/` — [GSD](https://github.com/gsd-build/get-shit-done) spec-driven dev skill (MIT)
+- `tools/claude-plugins-official/` — Anthropic-official `skill-creator` + `frontend-design` plugins
+- `tools/context-mode/` — [context-mode](https://github.com/mksglu/context-mode) MCP server for context sandboxing
+- `tools/claude-mem/` — [claude-mem](https://github.com/thedotmack/claude-mem) persistent memory compression
