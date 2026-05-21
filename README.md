@@ -1,3 +1,16 @@
+# A.I. Shark monorepo
+
+This repository now holds **two independent Next.js 14 apps** that share the repo but deploy to separate Vercel projects:
+
+| Path | App | Port |
+| --- | --- | --- |
+| `/` (root) | **The AI Shark** — marketing site for The AI Shark LLC | `3000` |
+| `/lakeline/` | **Lakeline** — mobile-first PWA for wake-surf + fishing forecasts | `3001` |
+
+Each has its own `package.json` and `node_modules`. Deploy by creating a Vercel project per app and setting its **Root Directory** to the corresponding path.
+
+---
+
 # The AI Shark
 
 Marketing site for **The AI Shark LLC** — an AI consulting firm that builds custom automations and unique AI solutions for niche industries.
@@ -33,6 +46,17 @@ Visit http://localhost:3000.
 - **Palette:** Deep ocean (`#02060f` / `#040b1c`) with electric cyan (`#22e0ff` / `#5cf2ff`) accents.
 - **Mark:** Custom SVG shark silhouette with circuit accents — lives in `components/Logo.tsx` and `app/icon.svg`.
 - **Contact:** `theaishark@theaishark.com`
+
+## Lakeline app
+
+Lives in `lakeline/`. See `lakeline/README.md` for setup, env vars, and the Phase 1 → 6 build plan. Quick start:
+
+```bash
+cd lakeline
+npm install
+cp .env.local.example .env.local
+npm run dev    # http://localhost:3001
+```
 
 ## Tools
 

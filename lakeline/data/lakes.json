@@ -1,0 +1,89 @@
+{
+  "lakes": [
+    {
+      "id": "lake-murray-ok",
+      "name": "Lake Murray",
+      "state": "OK",
+      "country": "US",
+      "timezone": "America/Chicago",
+      "center": { "lat": 34.05, "lon": -97.063 },
+      "mapZoom": 12.5,
+      "normalPoolFt": 700,
+      "usgsGaugeId": null,
+      "spots": [
+        {
+          "id": "marietta_landing",
+          "name": "Marietta Landing",
+          "lat": 34.0285,
+          "lon": -97.1052,
+          "shorelineBearing": 90,
+          "description": "South-end public ramp. Best when wind blows from the south or west.",
+          "fetchDistances": null
+        },
+        {
+          "id": "tipps_point",
+          "name": "Tipps Point",
+          "lat": 34.068,
+          "lon": -97.089,
+          "shorelineBearing": 200,
+          "description": "Mid-lake point on the west shore. Protected from east wind.",
+          "fetchDistances": null
+        },
+        {
+          "id": "tucker_tower",
+          "name": "Tucker Tower",
+          "lat": 34.049,
+          "lon": -97.052,
+          "shorelineBearing": 270,
+          "description": "Iconic east-shore landmark. Glass on west wind days.",
+          "fetchDistances": null
+        },
+        {
+          "id": "anadarche_cove",
+          "name": "Anadarche Cove",
+          "lat": 34.052,
+          "lon": -97.115,
+          "shorelineBearing": 80,
+          "description": "Deep west-shore cove. Strong protection from north and east wind.",
+          "fetchDistances": null
+        },
+        {
+          "id": "blue_creek_arm",
+          "name": "Blue Creek Arm",
+          "lat": 34.032,
+          "lon": -97.038,
+          "shorelineBearing": 300,
+          "description": "Narrow southeast finger. Sheltered from north winds.",
+          "fetchDistances": null
+        },
+        {
+          "id": "bee_creek",
+          "name": "Bee Creek",
+          "lat": 34.06,
+          "lon": -97.035,
+          "shorelineBearing": 290,
+          "description": "East-shore creek arm. Glass when wind is from the west.",
+          "fetchDistances": null
+        },
+        {
+          "id": "rock_creek",
+          "name": "Rock Creek",
+          "lat": 34.072,
+          "lon": -97.048,
+          "shorelineBearing": 240,
+          "description": "Northeast cove. Tight, sheltered from the prevailing south wind.",
+          "fetchDistances": null
+        },
+        {
+          "id": "north_shore",
+          "name": "North Shore",
+          "lat": 34.078,
+          "lon": -97.065,
+          "shorelineBearing": 180,
+          "description": "North-end open water. Best on south wind days.",
+          "fetchDistances": null
+        }
+      ]
+    }
+  ]
+}
