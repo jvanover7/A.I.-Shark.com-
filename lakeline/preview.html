@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Lakeline" />
+  <meta name="theme-color" content="#FAF7F2" />
+  <title>Lakeline — Lake Murray</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paper: "#FAF7F2",
+            ink: "#1A1614",
+            "ink-soft": "#5E574E",
+            "ink-mute": "#8A8276",
+            rule: "#E8E1D5",
+            chrome: "#C9BFAE",
+            cond: {
+              glass: "#1B4D6E",
+              prime: "#2D6A4F",
+              rideable: "#6B8E3D",
+              bumpy: "#B8860B",
+              choppy: "#C4571A",
+              blown: "#8B2500",
+              danger: "#8B0000",
+            },
+          },
+          fontFamily: {
+            sans: [
+              "-apple-system", "BlinkMacSystemFont", "ui-sans-serif",
+              "system-ui", "Segoe UI", "Helvetica Neue", "sans-serif",
+            ],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html, body { background: #FAF7F2; color: #1A1614; -webkit-font-smoothing: antialiased; }
+    .score-numeral { font-feature-settings: "tnum" 1, "lnum" 1; letter-spacing: -0.06em; }
+    button, a[role="button"] { min-height: 44px; min-width: 44px; }
+    /* Mock device frame to make it feel iPhone-like in desktop browsers */
+    @media (min-width: 480px) {
+      body { padding: 24px 0; display: flex; justify-content: center; background: #ECE7DD; }
+      .phone {
+        width: 390px;
+        min-height: 844px;
+        background: #FAF7F2;
+        border-radius: 44px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.18), 0 0 0 8px #1A1614, 0 0 0 9px #2A2520;
+        overflow: hidden;
+        position: relative;
+      }
+      .phone::before {
+        content: "";
+        position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+        width: 120px; height: 30px; background: #1A1614; border-radius: 18px; z-index: 50;
+      }
+      .phone-inner { padding-top: 50px; padding-bottom: 0; max-height: 844px; overflow-y: auto; }
+    }
+    @media (max-width: 479px) {
+      .phone { background: #FAF7F2; }
+    }
+  </style>
+</head>
+<body class="font-sans">
+  <div class="phone">
+    <div class="phone-inner max-w-md mx-auto">
+
+      <!-- HEADER -->
+      <header class="px-5 pt-6 pb-4">
+        <div class="flex items-baseline justify-between gap-3">
+          <div>
+            <div class="text-xs uppercase tracking-[0.18em] text-ink-mute">OK · Lake</div>
+            <h1 class="text-3xl font-medium tracking-tight text-ink leading-none mt-1">Lake Murray</h1>
+          </div>
+          <div class="text-right text-[11px] text-ink-mute uppercase tracking-widest">
+            Updated
+            <div class="text-ink-soft normal-case tracking-normal mt-0.5">6:42 am</div>
+          </div>
+        </div>
+        <div class="mt-3 text-sm text-ink-soft">
+          Next glass window today 6:50 am → Tucker Tower (Prime 78)
+        </div>
+      </header>
+
+      <!-- HERO GLASS SCORE -->
+      <section class="px-5 pt-8 pb-6 border-b border-rule">
+        <div class="text-xs uppercase tracking-[0.18em] text-ink-mute">Right now</div>
+        <div class="mt-3 flex items-end gap-4">
+          <div class="score-numeral text-[120px] leading-[0.85] font-medium" style="color:#2D6A4F">76</div>
+          <div class="pb-3">
+            <div class="text-2xl font-medium leading-tight" style="color:#2D6A4F">Prime</div>
+            <div class="text-sm text-ink-soft mt-1">
+              Best at <span class="text-ink font-medium">Tucker Tower</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3 text-sm text-ink-soft leading-snug">
+          Wind 4 mph from 220°. Gusts 7. Rising pressure, thin cloud cover.
+        </div>
+        <!-- score scale -->
+        <div class="mt-5">
+          <div class="flex h-1.5 rounded-full overflow-hidden">
+            <div class="flex-1" style="background:#8B2500"></div>
+            <div class="flex-1" style="background:#C4571A"></div>
+            <div class="flex-1" style="background:#B8860B"></div>
+            <div class="flex-1" style="background:#6B8E3D"></div>
+            <div class="flex-1" style="background:#2D6A4F"></div>
+            <div class="flex-1" style="background:#1B4D6E"></div>
+          </div>
+          <div class="relative h-3 mt-1">
+            <div class="absolute top-0 -translate-x-1/2 w-px h-2 bg-ink" style="left:76%"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GLASS WINDOWS -->
+      <section class="px-5 py-6 border-b border-rule">
+        <h2 class="text-xs uppercase tracking-[0.18em] text-ink-mute">Upcoming glass windows</h2>
+        <ul class="mt-3 divide-y divide-rule">
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="w-20 shrink-0 text-sm text-ink-soft">Today</div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">6:50 am – 8:30 am</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">→ Tucker Tower</div>
+            </div>
+            <div class="text-right shrink-0 score-numeral font-medium text-base" style="color:#2D6A4F">
+              78
+              <div class="text-[10px] uppercase tracking-wider text-ink-mute font-normal">Prime</div>
+            </div>
+          </li>
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="w-20 shrink-0 text-sm text-ink-soft">Today</div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">7:10 pm – 8:45 pm</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">→ Anadarche Cove</div>
+            </div>
+            <div class="text-right shrink-0 score-numeral font-medium text-base" style="color:#6B8E3D">
+              67
+              <div class="text-[10px] uppercase tracking-wider text-ink-mute font-normal">Rideable</div>
+            </div>
+          </li>
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="w-20 shrink-0 text-sm text-ink-soft">Tomorrow</div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">6:15 am – 9:00 am</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">→ Marietta Landing</div>
+            </div>
+            <div class="text-right shrink-0 score-numeral font-medium text-base" style="color:#1B4D6E">
+              91
+              <div class="text-[10px] uppercase tracking-wider text-ink-mute font-normal">Glass</div>
+            </div>
+          </li>
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="w-20 shrink-0 text-sm text-ink-soft">Tomorrow</div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">6:45 pm – 8:15 pm</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">→ Tipps Point</div>
+            </div>
+            <div class="text-right shrink-0 score-numeral font-medium text-base" style="color:#2D6A4F">
+              74
+              <div class="text-[10px] uppercase tracking-wider text-ink-mute font-normal">Prime</div>
+            </div>
+          </li>
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="w-20 shrink-0 text-sm text-ink-soft">Tuesday</div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">6:10 am – 7:30 am</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">→ Tucker Tower</div>
+            </div>
+            <div class="text-right shrink-0 score-numeral font-medium text-base" style="color:#6B8E3D">
+              63
+              <div class="text-[10px] uppercase tracking-wider text-ink-mute font-normal">Rideable</div>
+            </div>
+          </li>
+
+        </ul>
+      </section>
+
+      <!-- CONDITIONS -->
+      <section class="px-5 py-6 border-b border-rule">
+        <h2 class="text-xs uppercase tracking-[0.18em] text-ink-mute">Conditions</h2>
+        <div class="mt-4 grid grid-cols-2 gap-x-6 gap-y-5">
+
+          <div>
+            <div class="text-[11px] uppercase tracking-widest text-ink-mute">Wind</div>
+            <div class="mt-1 text-xl font-medium text-ink score-numeral">4 mph</div>
+            <div class="text-xs text-ink-soft mt-0.5">SW · 220°</div>
+          </div>
+
+          <div>
+            <div class="text-[11px] uppercase tracking-widest text-ink-mute">Gusts</div>
+            <div class="mt-1 text-xl font-medium text-ink score-numeral">7 mph</div>
+            <div class="text-xs text-ink-soft mt-0.5">+3 delta</div>
+          </div>
+
+          <div>
+            <div class="text-[11px] uppercase tracking-widest text-ink-mute">Air</div>
+            <div class="mt-1 text-xl font-medium text-ink score-numeral">64°</div>
+            <div class="text-xs text-ink-soft mt-0.5">feels 60°</div>
+          </div>
+
+          <div>
+            <div class="text-[11px] uppercase tracking-widest text-ink-mute">Pressure</div>
+            <div class="mt-1 text-xl font-medium text-ink score-numeral">1019 hPa</div>
+            <div class="text-xs mt-0.5" style="color:#2D6A4F">↑ Rising</div>
+          </div>
+
+          <div>
+            <div class="text-[11px] uppercase tracking-widest text-ink-mute">Cloud</div>
+            <div class="mt-1 text-xl font-medium text-ink score-numeral">30%</div>
+            <div class="text-xs text-ink-soft mt-0.5">Open sky</div>
+          </div>
+
+          <div>
+            <div class="text-[11px] uppercase tracking-widest text-ink-mute">UV</div>
+            <div class="mt-1 text-xl font-medium text-ink score-numeral">4.0</div>
+            <div class="text-xs text-ink-soft mt-0.5">Sunscreen</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SPOTS -->
+      <section class="px-5 py-6 border-b border-rule">
+        <h2 class="text-xs uppercase tracking-[0.18em] text-ink-mute">Spots</h2>
+        <ul class="mt-3 divide-y divide-rule">
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">Tucker Tower</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">Protection 88 · Iconic east-shore landmark. Glass on west wind days.</div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="score-numeral text-xl font-medium" style="color:#2D6A4F">76</div>
+              <div class="text-[10px] uppercase tracking-wider" style="color:#2D6A4F">Prime</div>
+            </div>
+          </li>
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">Anadarche Cove</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">Protection 72 · Deep west-shore cove. Strong protection from N/E wind.</div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="score-numeral text-xl font-medium" style="color:#2D6A4F">71</div>
+              <div class="text-[10px] uppercase tracking-wider" style="color:#2D6A4F">Prime</div>
+            </div>
+          </li>
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">Bee Creek</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">Protection 68 · East-shore creek arm. Glass on west wind.</div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="score-numeral text-xl font-medium" style="color:#6B8E3D">66</div>
+              <div class="text-[10px] uppercase tracking-wider" style="color:#6B8E3D">Rideable</div>
+            </div>
+          </li>
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">Rock Creek</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">Protection 61 · Northeast cove, tight and sheltered.</div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="score-numeral text-xl font-medium" style="color:#6B8E3D">62</div>
+              <div class="text-[10px] uppercase tracking-wider" style="color:#6B8E3D">Rideable</div>
+            </div>
+          </li>
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">Tipps Point</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">Protection 54 · Mid-lake point on the west shore.</div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="score-numeral text-xl font-medium" style="color:#6B8E3D">58</div>
+              <div class="text-[10px] uppercase tracking-wider" style="color:#6B8E3D">Rideable</div>
+            </div>
+          </li>
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">Blue Creek Arm</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">Protection 47 · Narrow SE finger, shelter from N wind.</div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="score-numeral text-xl font-medium" style="color:#B8860B">52</div>
+              <div class="text-[10px] uppercase tracking-wider" style="color:#B8860B">Bumpy</div>
+            </div>
+          </li>
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">Marietta Landing</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">Protection 31 · South-end public ramp.</div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="score-numeral text-xl font-medium" style="color:#B8860B">44</div>
+              <div class="text-[10px] uppercase tracking-wider" style="color:#B8860B">Bumpy</div>
+            </div>
+          </li>
+
+          <li class="py-3 flex items-baseline gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-ink truncate">North Shore</div>
+              <div class="text-xs text-ink-soft mt-0.5 truncate">Protection 19 · North-end open water.</div>
+            </div>
+            <div class="text-right shrink-0">
+              <div class="score-numeral text-xl font-medium" style="color:#C4571A">37</div>
+              <div class="text-[10px] uppercase tracking-wider" style="color:#C4571A">Choppy</div>
+            </div>
+          </li>
+
+        </ul>
+      </section>
+
+      <!-- MAP -->
+      <section class="border-b border-rule">
+        <div class="px-5 pt-6 pb-3 flex items-baseline justify-between">
+          <h2 class="text-xs uppercase tracking-[0.18em] text-ink-mute">Map</h2>
+          <div class="text-xs text-ink-soft">Wind 4 mph from 220°</div>
+        </div>
+        <!-- mock satellite-feel SVG of a lake outline w/ scored markers -->
+        <div class="w-full h-[300px] relative" style="background: radial-gradient(ellipse at 30% 40%, #2C4F6E 0%, #1B3D5A 60%, #0F2942 100%);">
+          <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 w-full h-full">
+            <!-- vague land masses for satellite feel -->
+            <path d="M0,0 L400,0 L400,80 C 340,90 300,60 260,90 C 220,120 180,80 130,110 C 80,140 40,100 0,120 Z" fill="#3A2E22" opacity="0.85"/>
+            <path d="M0,300 L400,300 L400,210 C 350,220 320,250 280,240 C 240,230 220,260 180,250 C 140,240 100,270 60,260 C 30,253 10,265 0,260 Z" fill="#3A2E22" opacity="0.85"/>
+            <!-- lake body with vague shore irregularity -->
+            <path d="M0,120 C 40,100 80,140 130,110 C 180,80 220,120 260,90 C 300,60 340,90 400,80 L400,210 C 350,220 320,250 280,240 C 240,230 220,260 180,250 C 140,240 100,270 60,260 C 30,253 10,265 0,260 Z"
+                  fill="none" stroke="#FAF7F2" stroke-opacity="0.18" stroke-width="1.2"/>
+            <!-- wind arrow corner -->
+            <g transform="translate(355,40)" opacity="0.9">
+              <circle r="22" fill="#1A1614" fill-opacity="0.55" stroke="#FAF7F2" stroke-opacity="0.4"/>
+              <g transform="rotate(220)" fill="#FAF7F2">
+                <path d="M 0,-12 L 4,6 L 0,3 L -4,6 Z"/>
+              </g>
+              <text y="32" text-anchor="middle" fill="#FAF7F2" font-size="9" font-family="-apple-system,system-ui,sans-serif" opacity="0.85">4mph SW</text>
+            </g>
+          </svg>
+          <!-- scored markers, absolute-positioned -->
+          <div class="absolute" style="left:64%;top:42%;">
+            <div class="rounded-full text-white text-[10px] font-semibold grid place-items-center" style="width:24px;height:24px;background:#2D6A4F;border:2px solid #FAF7F2;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">76</div>
+          </div>
+          <div class="absolute" style="left:24%;top:38%;">
+            <div class="rounded-full text-white text-[10px] font-semibold grid place-items-center" style="width:24px;height:24px;background:#2D6A4F;border:2px solid #FAF7F2;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">71</div>
+          </div>
+          <div class="absolute" style="left:74%;top:30%;">
+            <div class="rounded-full text-white text-[10px] font-semibold grid place-items-center" style="width:24px;height:24px;background:#6B8E3D;border:2px solid #FAF7F2;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">66</div>
+          </div>
+          <div class="absolute" style="left:80%;top:22%;">
+            <div class="rounded-full text-white text-[10px] font-semibold grid place-items-center" style="width:24px;height:24px;background:#6B8E3D;border:2px solid #FAF7F2;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">62</div>
+          </div>
+          <div class="absolute" style="left:38%;top:24%;">
+            <div class="rounded-full text-white text-[10px] font-semibold grid place-items-center" style="width:24px;height:24px;background:#6B8E3D;border:2px solid #FAF7F2;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">58</div>
+          </div>
+          <div class="absolute" style="left:84%;top:62%;">
+            <div class="rounded-full text-white text-[10px] font-semibold grid place-items-center" style="width:24px;height:24px;background:#B8860B;border:2px solid #FAF7F2;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">52</div>
+          </div>
+          <div class="absolute" style="left:14%;top:78%;">
+            <div class="rounded-full text-white text-[10px] font-semibold grid place-items-center" style="width:24px;height:24px;background:#B8860B;border:2px solid #FAF7F2;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">44</div>
+          </div>
+          <div class="absolute" style="left:52%;top:14%;">
+            <div class="rounded-full text-white text-[10px] font-semibold grid place-items-center" style="width:24px;height:24px;background:#C4571A;border:2px solid #FAF7F2;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">37</div>
+          </div>
+        </div>
+        <p class="px-5 py-3 text-[11px] text-ink-mute">Preview only — real build renders a Mapbox satellite layer with these markers.</p>
+      </section>
+
+      <!-- SOLUNAR -->
+      <section class="px-5 py-6 border-b border-rule">
+        <h2 class="text-xs uppercase tracking-[0.18em] text-ink-mute">Moon &amp; bite</h2>
+        <div class="mt-4 flex items-baseline gap-4">
+          <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden>
+            <circle cx="20" cy="20" r="20" fill="#1A1614"/>
+            <path d="M 20 0 a 20 20 0 1 1 0 40 a 13 20 0 1 0 0 -40" fill="#FAF7F2"/>
+          </svg>
+          <div>
+            <div class="text-lg font-medium text-ink">Waxing Gibbous</div>
+            <div class="text-xs text-ink-soft">76% illuminated</div>
+          </div>
+        </div>
+        <div class="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+          <div class="flex items-baseline justify-between">
+            <span class="text-ink-mute text-[11px] uppercase tracking-widest">Sunrise</span>
+            <span class="text-ink score-numeral">6:42 am</span>
+          </div>
+          <div class="flex items-baseline justify-between">
+            <span class="text-ink-mute text-[11px] uppercase tracking-widest">Sunset</span>
+            <span class="text-ink score-numeral">7:58 pm</span>
+          </div>
+          <div class="flex items-baseline justify-between">
+            <span class="text-ink-mute text-[11px] uppercase tracking-widest">Moonrise</span>
+            <span class="text-ink score-numeral">2:18 pm</span>
+          </div>
+          <div class="flex items-baseline justify-between">
+            <span class="text-ink-mute text-[11px] uppercase tracking-widest">Moonset</span>
+            <span class="text-ink score-numeral">3:42 am</span>
+          </div>
+        </div>
+        <div class="mt-5">
+          <div class="text-[11px] uppercase tracking-widest text-ink-mute">Major bite</div>
+          <ul class="mt-1 text-sm text-ink">
+            <li>8:50 am – 10:50 am</li>
+            <li>9:20 pm – 11:20 pm</li>
+          </ul>
+        </div>
+        <div class="mt-3">
+          <div class="text-[11px] uppercase tracking-widest text-ink-mute">Minor bite</div>
+          <ul class="mt-1 text-sm text-ink-soft">
+            <li>1:48 pm – 2:48 pm</li>
+            <li>3:12 am – 4:12 am</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- BOTTOM NAV -->
+      <nav class="sticky bottom-0 bg-paper border-t border-rule" style="padding-bottom: max(env(safe-area-inset-bottom), 8px);">
+        <ul class="grid grid-cols-4">
+          <li>
+            <button class="w-full py-2 flex flex-col items-center gap-1 text-ink" aria-current="page">
+              <span class="w-6 h-6 block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 14c3-3 5-3 8 0s5 3 8 0"/>
+                  <path d="M3 19c3-3 5-3 8 0s5 3 8 0"/>
+                </svg>
+              </span>
+              <span class="text-[10px] uppercase tracking-widest">Surf</span>
+            </button>
+          </li>
+          <li>
+            <button class="w-full py-2 flex flex-col items-center gap-1 text-ink-mute">
+              <span class="w-6 h-6 block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12c4-6 12-6 16 0-4 6-12 6-16 0Z"/>
+                  <path d="M19 12l3-3v6l-3-3Z"/>
+                  <circle cx="9" cy="11" r="0.6" fill="currentColor"/>
+                </svg>
+              </span>
+              <span class="text-[10px] uppercase tracking-widest">Fish</span>
+            </button>
+          </li>
+          <li>
+            <button class="w-full py-2 flex flex-col items-center gap-1 text-ink-mute">
+              <span class="w-6 h-6 block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2V6Z"/>
+                  <path d="M9 4v16M15 6v16"/>
+                </svg>
+              </span>
+              <span class="text-[10px] uppercase tracking-widest">Map</span>
+            </button>
+          </li>
+          <li>
+            <button class="w-full py-2 flex flex-col items-center gap-1 text-ink-mute">
+              <span class="w-6 h-6 block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 4h12v17l-6-4-6 4V4Z"/>
+                </svg>
+              </span>
+              <span class="text-[10px] uppercase tracking-widest">Saved</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+    </div>
+  </div>
+</body>
+</html>
