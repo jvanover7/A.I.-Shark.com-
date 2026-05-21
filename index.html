@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Lakeline" />
+  <meta name="theme-color" content="#FAFAFA" />
+  <title>Lakeline — Tucker Tower</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: "#FAFAFA",
+            card: "#FFFFFF",
+            ink: "#0E1116",
+            "ink-2": "#1F2329",
+            "ink-soft": "#5B6068",
+            "ink-mute": "#9CA3AF",
+            rule: "#E5E7EB",
+            "rule-2": "#F1F3F5",
+            "accent-yellow": "#F4C518",
+            "brand-green": "#16A34A",
+            // Surfline 7-tier rating (eyedrop'd approximation from screenshots)
+            rate: {
+              vpoor: "#9CA3AF",
+              poor: "#F49635",
+              pfair: "#F5A623",
+              fair: "#F5C842",
+              fgood: "#84B33B",
+              good: "#1DBF73",
+              epic: "#0E6543",
+              pink: "#E91E63",
+            },
+          },
+          fontFamily: {
+            sans: [
+              "Helvetica Neue", "Helvetica", "Inter",
+              "-apple-system", "BlinkMacSystemFont", "Arial", "sans-serif",
+            ],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    html, body {
+      background: #FAFAFA;
+      color: #0E1116;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .num { font-feature-settings: "tnum" 1, "lnum" 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    .num-tight { letter-spacing: -0.04em; }
+    .label-cap { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: #5B6068; }
+    button, a[role="button"] { min-height: 44px; min-width: 44px; }
+
+    /* Surfline yellow page-title accent bar */
+    .y-bar { width: 4px; background: #F4C518; border-radius: 2px; align-self: stretch; }
+
+    /* 5-segment rating pill: shows discrete tier fill left-to-right */
+    .rating-pill { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+    .rating-pill > div { height: 6px; border-radius: 2px; background: #E5E7EB; }
+
+    /* Status dot for the top multi-cam strip */
+    .dot { width: 7px; height: 7px; border-radius: 999px; display: inline-block; flex-shrink: 0; }
+
+    /* Cards (Surfline-style: thin border + soft radius + plenty of whitespace) */
+    .card { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 10px; }
+
+    /* Live cam hero */
+    .cam-hero {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background:
+        radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.20), transparent 60%),
+        radial-gradient(ellipse at 70% 80%, rgba(255,255,255,0.08), transparent 70%),
+        linear-gradient(180deg, #1E4D6E 0%, #0B6FB8 45%, #0E2A40 100%);
+      overflow: hidden;
+    }
+    .cam-hero::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 45%, rgba(0,0,0,0.6) 100%);
+      pointer-events: none;
+    }
+    .cam-wave path { animation: drift 14s ease-in-out infinite alternate; }
+    @keyframes drift { from { transform: translateX(-10px); } to { transform: translateX(10px); } }
+
+    /* Wave-shape curve under daily heights */
+    .wave-curve { height: 14px; width: 100%; }
+
+    .hscroll { -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .hscroll::-webkit-scrollbar { display: none; }
+
+    /* Desktop iPhone frame */
+    @media (min-width: 480px) {
+      body { padding: 24px 0; display: flex; justify-content: center; background: #E8EAED; }
+      .phone {
+        width: 390px;
+        min-height: 844px;
+        background: #FAFAFA;
+        border-radius: 44px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.20), 0 0 0 8px #0E1116, 0 0 0 9px #2A2E33;
+        overflow: hidden;
+        position: relative;
+      }
+      .phone::before {
+        content: ""; position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+        width: 120px; height: 30px; background: #0E1116; border-radius: 18px; z-index: 60;
+      }
+      .phone-inner { max-height: 844px; overflow-y: auto; }
+    }
+  </style>
+</head>
+<body class="font-sans">
+  <div class="phone">
+    <div class="phone-inner max-w-md mx-auto">
+
+      <!-- MULTI-CAM STRIP (Surfline-signature top spot ticker) -->
+      <div class="bg-card border-b border-rule">
+        <div class="flex items-center gap-3 px-3 py-2 overflow-x-auto hscroll">
+          <div class="flex items-center gap-1.5 shrink-0">
+            <svg class="w-4 h-4 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="6" width="14" height="12" rx="2"/>
+              <path d="M22 8l-6 4 6 4V8Z"/>
+            </svg>
+            <span class="label-cap text-ink">Multi-Cam</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="dot" style="background:#1DBF73"></span>
+            <span class="text-[12px] font-semibold text-ink whitespace-nowrap">Tucker Tower</span>
+            <span class="text-[12px] text-ink-soft num whitespace-nowrap">76</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="dot" style="background:#1DBF73"></span>
+            <span class="text-[12px] font-semibold text-ink whitespace-nowrap">Anadarche</span>
+            <span class="text-[12px] text-ink-soft num whitespace-nowrap">71</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="dot" style="background:#84B33B"></span>
+            <span class="text-[12px] font-semibold text-ink whitespace-nowrap">Bee Creek</span>
+            <span class="text-[12px] text-ink-soft num whitespace-nowrap">66</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="dot" style="background:#84B33B"></span>
+            <span class="text-[12px] font-semibold text-ink whitespace-nowrap">Rock Creek</span>
+            <span class="text-[12px] text-ink-soft num whitespace-nowrap">62</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="dot" style="background:#84B33B"></span>
+            <span class="text-[12px] font-semibold text-ink whitespace-nowrap">Tipps Point</span>
+            <span class="text-[12px] text-ink-soft num whitespace-nowrap">58</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="dot" style="background:#F5C842"></span>
+            <span class="text-[12px] font-semibold text-ink whitespace-nowrap">Blue Creek</span>
+            <span class="text-[12px] text-ink-soft num whitespace-nowrap">52</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="dot" style="background:#F5C842"></span>
+            <span class="text-[12px] font-semibold text-ink whitespace-nowrap">Marietta</span>
+            <span class="text-[12px] text-ink-soft num whitespace-nowrap">44</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="dot" style="background:#F49635"></span>
+            <span class="text-[12px] font-semibold text-ink whitespace-nowrap">North Shore</span>
+            <span class="text-[12px] text-ink-soft num whitespace-nowrap">37</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE CAM HERO -->
+      <section class="relative">
+        <div class="cam-hero">
+          <svg class="cam-wave absolute inset-0 w-full h-full opacity-50" viewBox="0 0 400 225" preserveAspectRatio="none">
+            <path d="M0,130 C 60,118 120,142 180,130 C 240,118 300,142 400,130 L400,225 L0,225 Z" fill="#FAFAFA" fill-opacity="0.12"/>
+            <path d="M0,155 C 60,145 120,165 180,155 C 240,145 300,165 400,155 L400,225 L0,225 Z" fill="#FAFAFA" fill-opacity="0.10"/>
+            <path d="M0,180 C 60,172 120,188 180,180 C 240,172 300,188 400,180 L400,225 L0,225 Z" fill="#FAFAFA" fill-opacity="0.07"/>
+          </svg>
+          <div class="absolute top-3 left-3 z-10 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm rounded-full pl-1.5 pr-2.5 py-0.5">
+            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+            <span class="text-[10px] tracking-widest text-white font-bold">LIVE</span>
+          </div>
+          <div class="absolute top-3 right-3 z-10 flex items-center gap-2">
+            <button class="w-9 h-9 rounded-full bg-black/55 backdrop-blur-sm grid place-items-center text-white">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 0 1 15.5-6.36L21 8"/><path d="M21 3v5h-5"/>
+                <path d="M21 12a9 9 0 0 1-15.5 6.36L3 16"/><path d="M3 21v-5h5"/>
+              </svg>
+            </button>
+            <button class="w-9 h-9 rounded-full bg-black/55 backdrop-blur-sm grid place-items-center text-white">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6"/>
+                <path d="M3 12h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6Z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="absolute bottom-3 left-4 right-4 z-10 flex items-end justify-between gap-3">
+            <div>
+              <div class="text-[10px] tracking-[0.2em] text-white/85 font-bold uppercase">OK · Lake Murray</div>
+              <h1 class="text-white text-xl font-bold tracking-tight mt-0.5">Tucker Tower Cam</h1>
+            </div>
+            <span class="text-white/70 text-[10px] num whitespace-nowrap">12 min ago</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE TITLE w/ YELLOW ACCENT BAR + TAB NAV -->
+      <section class="px-5 pt-5 pb-3 bg-bg">
+        <div class="flex items-start gap-3">
+          <div class="y-bar" style="min-height:48px"></div>
+          <div class="flex-1">
+            <h2 class="text-2xl font-bold text-ink tracking-tight leading-tight">Lake Murray Glass Report</h2>
+            <div class="text-[13px] text-ink-mute mt-0.5">Local lake forecast</div>
+          </div>
+          <button class="rounded-full border border-rule bg-card text-[12px] font-semibold text-ink px-3 py-2 flex items-center gap-1 whitespace-nowrap">
+            Nearby <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </div>
+        <!-- TAB NAV -->
+        <nav class="mt-5 flex items-center gap-5 text-[13px] font-bold tracking-tight">
+          <button class="text-ink relative pb-2">
+            Report &amp; Forecast
+            <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-ink rounded-full"></span>
+          </button>
+          <button class="text-ink-mute pb-2">Analysis</button>
+          <button class="text-ink-mute pb-2">Charts</button>
+          <button class="text-ink-mute pb-2">Guide</button>
+        </nav>
+      </section>
+
+      <!-- CURRENT GLASS CONDITIONS PANEL -->
+      <section class="px-4 py-4 bg-bg space-y-3">
+        <div>
+          <h3 class="text-lg font-bold text-ink tracking-tight">Current Glass Conditions</h3>
+          <div class="text-[12px] text-ink-mute mt-0.5">Local time: 6:42 am, CDT</div>
+        </div>
+
+        <!-- Rating card -->
+        <div class="card p-4">
+          <div class="flex items-baseline justify-between">
+            <span class="label-cap">Glass Rating</span>
+            <span class="text-[10px] text-ink-mute flex items-center gap-1">
+              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M3 12l3-4 3 6 4-10 3 12 3-6h2"/></svg>
+              Lakeline Model
+            </span>
+          </div>
+          <div class="mt-1 flex items-end gap-3">
+            <span class="text-[28px] font-bold tracking-tight" style="color:#1DBF73">PRIME</span>
+            <span class="num text-base font-semibold text-ink-soft pb-1">76</span>
+          </div>
+          <div class="rating-pill mt-2">
+            <div style="background:#F49635"></div>
+            <div style="background:#F5C842"></div>
+            <div style="background:#84B33B"></div>
+            <div style="background:#1DBF73"></div>
+            <div></div>
+          </div>
+        </div>
+
+        <!-- Stat cards row 1 -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="card p-3">
+            <span class="label-cap">Wind</span>
+            <div class="mt-1 flex items-baseline gap-1">
+              <span class="num text-[28px] font-bold text-ink leading-none num-tight">4</span>
+              <span class="text-[12px] font-semibold text-ink-soft">mph</span>
+            </div>
+            <div class="text-[12px] text-ink-soft mt-1">7 mph gusts · SW</div>
+          </div>
+          <div class="card p-3 relative overflow-hidden">
+            <span class="label-cap">Direction</span>
+            <div class="mt-1 flex items-baseline gap-1">
+              <span class="num text-[28px] font-bold text-ink leading-none num-tight">220°</span>
+            </div>
+            <div class="text-[12px] text-ink-soft mt-1">Cross-shore offshore</div>
+            <!-- wind compass widget like Surfline's "wind on map" card -->
+            <svg class="absolute -right-2 -bottom-2 w-14 h-14 opacity-90" viewBox="0 0 50 50">
+              <circle cx="25" cy="25" r="22" fill="#F1F3F5" stroke="#E5E7EB"/>
+              <text x="25" y="9" text-anchor="middle" font-size="6" fill="#5B6068" font-weight="700">N</text>
+              <text x="45" y="27" text-anchor="middle" font-size="6" fill="#5B6068" font-weight="700">E</text>
+              <text x="25" y="46" text-anchor="middle" font-size="6" fill="#5B6068" font-weight="700">S</text>
+              <text x="6" y="27" text-anchor="middle" font-size="6" fill="#5B6068" font-weight="700">W</text>
+              <g transform="rotate(220 25 25)">
+                <path d="M25,10 L29,28 L25,25 L21,28 Z" fill="#0E1116"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="card p-3">
+            <span class="label-cap">Pressure</span>
+            <div class="mt-1 flex items-baseline gap-1">
+              <span class="num text-[28px] font-bold text-ink leading-none num-tight">1019</span>
+              <span class="text-[12px] font-semibold text-ink-soft">hPa</span>
+            </div>
+            <div class="text-[12px] mt-1 font-semibold" style="color:#1DBF73">↑ Rising · clean ahead</div>
+          </div>
+          <div class="card p-3">
+            <span class="label-cap">Temperature</span>
+            <div class="mt-1 flex items-baseline gap-2">
+              <div class="flex items-baseline gap-0.5">
+                <svg class="w-3 h-3 mr-0.5" viewBox="0 0 24 24" fill="#0B6FB8"><path d="M12 2C8 8 6 12 6 16a6 6 0 0 0 12 0c0-4-2-8-6-14Z"/></svg>
+                <span class="num text-base font-bold text-ink">68°</span>
+              </div>
+              <div class="flex items-baseline gap-0.5">
+                <svg class="w-3 h-3 mr-0.5" viewBox="0 0 24 24" fill="#F5A623"><circle cx="12" cy="12" r="5"/><g stroke="#F5A623" stroke-width="2" stroke-linecap="round"><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.5 4.5l1.4 1.4M18.1 18.1l1.4 1.4M4.5 19.5l1.4-1.4M18.1 5.9l1.4-1.4"/></g></svg>
+                <span class="num text-base font-bold text-ink">64°</span>
+              </div>
+            </div>
+            <div class="text-[12px] text-ink-soft mt-1">Water · Air feels 60°</div>
+          </div>
+        </div>
+
+        <!-- Lake level + UV row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="card p-3">
+            <span class="label-cap">Lake Level</span>
+            <div class="mt-1 flex items-baseline gap-1">
+              <span class="num text-[28px] font-bold text-ink leading-none num-tight">699.4</span>
+              <span class="text-[12px] font-semibold text-ink-soft">ft</span>
+            </div>
+            <div class="text-[12px] text-ink-soft mt-1">−0.6 ft pool · all ramps open</div>
+          </div>
+          <div class="card p-3">
+            <span class="label-cap">UV / Sun</span>
+            <div class="mt-1 flex items-center gap-2">
+              <span class="num text-[28px] font-bold text-ink leading-none num-tight">4</span>
+              <span class="inline-flex items-center gap-1 bg-[#FEF3C7] text-[#92400E] rounded-full px-2 py-0.5 text-[10px] font-bold">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>
+                SPF 30+
+              </span>
+            </div>
+            <div class="text-[12px] text-ink-soft mt-1">Sunrise 6:42a · Sunset 7:58p</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AFFILIATE / CTA STRIP — Surfline-style -->
+      <section class="px-4 py-3 bg-bg">
+        <button class="card w-full flex items-center justify-between px-4 py-3">
+          <span class="text-[13px] text-ink-soft">Find a wakeboard for these conditions.</span>
+          <span class="flex items-center gap-2">
+            <span class="text-[11px] font-bold text-ink tracking-tight">RONIX</span>
+            <svg class="w-4 h-4 text-ink-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+          </span>
+        </button>
+      </section>
+
+      <!-- FORECASTER CARD (Surfline-signature) -->
+      <section class="px-4 py-3 bg-bg">
+        <article class="card p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#16A34A] to-[#0E6543] grid place-items-center text-white font-bold text-sm">L</div>
+              <div>
+                <div class="text-[13px] font-bold text-ink">Lake Murray Forecast</div>
+                <div class="text-[11px] text-ink-mute">Lakeline AI · Updated 9 min ago</div>
+              </div>
+            </div>
+            <button class="text-ink-mute"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></button>
+          </div>
+          <div class="mt-3">
+            <div class="text-[12px] font-bold text-ink uppercase tracking-widest">Today</div>
+            <p class="mt-2 text-[14px] font-bold leading-snug text-ink">
+              Prime glass window 6:50a–8:30a at Tucker Tower, blown out by noon, evening recovery after 7:10p.
+            </p>
+            <p class="mt-2 text-[13px] leading-relaxed text-ink-soft">
+              Light SW breeze under 5 mph holds through breakfast — east shore spots ride glass with that direction.
+              Thermal wind lifts off the lake by 10a and pushes through 5p. Pressure rising, no front in sight.
+            </p>
+          </div>
+          <button class="mt-4 w-full rounded-full border border-rule bg-card text-[12px] font-bold text-ink py-2.5 flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="#1DBF73"><path d="M12 2l3 7h7l-5.5 4 2 8L12 16l-6.5 5 2-8L2 9h7Z"/></svg>
+            View days to watch
+          </button>
+        </article>
+      </section>
+
+      <!-- 7-DAY MULTI-SPOT MATRIX -->
+      <section class="bg-card border-y border-rule">
+        <div class="px-4 pt-5 pb-3 flex items-center justify-between">
+          <h3 class="text-[15px] font-bold text-ink tracking-tight">7-Day Outlook</h3>
+          <button class="text-[11px] font-bold text-ink uppercase tracking-widest">All hours →</button>
+        </div>
+        <div class="overflow-x-auto hscroll px-4 pb-4">
+          <table class="border-collapse" style="min-width:560px">
+            <thead>
+              <tr>
+                <th class="w-32"></th>
+                <th class="text-center px-2 pb-2">
+                  <div class="text-[11px] font-bold text-ink-mute uppercase">Wed</div>
+                  <div class="text-[11px] text-ink-mute num">21</div>
+                </th>
+                <th class="text-center px-2 pb-2">
+                  <div class="text-[11px] font-bold text-ink-mute uppercase">Thu</div>
+                  <div class="text-[11px] text-ink-mute num">22</div>
+                </th>
+                <th class="text-center px-2 pb-2">
+                  <div class="text-[11px] font-bold text-ink-mute uppercase">Fri</div>
+                  <div class="text-[11px] text-ink-mute num">23</div>
+                </th>
+                <th class="text-center px-2 pb-2">
+                  <div class="text-[11px] font-bold text-ink-mute uppercase">Sat</div>
+                  <div class="text-[11px] text-ink-mute num">24</div>
+                </th>
+                <th class="text-center px-2 pb-2">
+                  <div class="text-[11px] font-bold text-ink-mute uppercase">Sun</div>
+                  <div class="text-[11px] text-ink-mute num">25</div>
+                </th>
+                <th class="text-center px-2 pb-2">
+                  <div class="text-[11px] font-bold text-ink-mute uppercase">Mon</div>
+                  <div class="text-[11px] text-ink-mute num">26</div>
+                </th>
+                <th class="text-center px-2 pb-2">
+                  <div class="text-[11px] font-bold text-ink-mute uppercase">Tue</div>
+                  <div class="text-[11px] text-ink-mute num">27</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="align-top">
+              <!-- ROW: Tucker Tower -->
+              <tr class="border-t border-rule">
+                <td class="text-[13px] font-bold text-ink py-3 pr-3">Tucker Tower</td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">76</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,5 20,9 30,4 L40,7 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">91</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,8 C 10,2 20,4 30,2 L40,4 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#0E6543"></div><div class="w-2 h-1 rounded-sm" style="background:#0E6543"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">62</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,7 20,12 30,9 L40,11 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">34</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,12 20,8 30,11 L40,9 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div><div class="w-2 h-1 rounded-sm" style="background:#F5A623"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">48</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,9 20,11 30,7 L40,9 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F5A623"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">79</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,8 C 10,4 20,6 30,3 L40,5 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">68</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,9 C 10,6 20,9 30,5 L40,7 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div></div>
+                </td>
+              </tr>
+
+              <!-- ROW: Anadarche Cove -->
+              <tr class="border-t border-rule">
+                <td class="text-[13px] font-bold text-ink py-3 pr-3">Anadarche Cove</td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">71</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,7 20,11 30,6 L40,8 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">82</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,9 C 10,3 20,5 30,3 L40,5 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#0E6543"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">58</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,8 20,12 30,9 L40,11 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">42</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,12 20,9 30,11 L40,10 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div><div class="w-2 h-1 rounded-sm" style="background:#F5A623"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">55</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,8 20,11 30,7 L40,9 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">73</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,8 C 10,5 20,7 30,4 L40,6 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">88</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,8 C 10,3 20,2 30,2 L40,3 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#0E6543"></div><div class="w-2 h-1 rounded-sm" style="background:#0E6543"></div><div class="w-2 h-1 rounded-sm" style="background:#0E6543"></div></div>
+                </td>
+              </tr>
+
+              <!-- ROW: Marietta -->
+              <tr class="border-t border-rule">
+                <td class="text-[13px] font-bold text-ink py-3 pr-3">Marietta Landing</td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">44</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,11 20,8 30,11 L40,10 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F5A623"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">95</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,9 C 10,2 20,1 30,1 L40,2 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#E91E63"></div><div class="w-2 h-1 rounded-sm" style="background:#E91E63"></div><div class="w-2 h-1 rounded-sm" style="background:#0E6543"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">52</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,8 20,11 30,9 L40,11 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">28</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,11 C 10,13 20,9 30,12 L40,11 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">36</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,11 20,9 30,11 L40,10 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div><div class="w-2 h-1 rounded-sm" style="background:#F5A623"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">58</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,7 20,10 30,7 L40,9 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">81</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,8 C 10,3 20,4 30,3 L40,5 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#0E6543"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div></div>
+                </td>
+              </tr>
+
+              <!-- ROW: North Shore -->
+              <tr class="border-t border-rule">
+                <td class="text-[13px] font-bold text-ink py-3 pr-3">North Shore</td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">37</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,12 20,9 30,12 L40,10 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div><div class="w-2 h-1 rounded-sm" style="background:#F5A623"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">66</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,9 C 10,6 20,8 30,5 L40,7 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">48</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,9 20,11 30,8 L40,10 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F5A623"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">22</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,11 C 10,13 20,10 30,13 L40,12 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">31</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,11 20,9 30,11 L40,10 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F49635"></div><div class="w-2 h-1 rounded-sm" style="background:#F5A623"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">62</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,7 20,9 30,6 L40,8 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div><div class="w-2 h-1 rounded-sm" style="background:#1DBF73"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div></div>
+                </td>
+                <td class="px-2 py-3 text-center">
+                  <div class="num text-[14px] font-bold text-ink">54</div>
+                  <svg class="wave-curve mt-1" viewBox="0 0 40 14" preserveAspectRatio="none"><path d="M0,10 C 10,8 20,10 30,7 L40,9 L40,14 L0,14 Z" fill="#E5E7EB"/></svg>
+                  <div class="flex gap-0.5 justify-center mt-1"><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div><div class="w-2 h-1 rounded-sm" style="background:#84B33B"></div><div class="w-2 h-1 rounded-sm" style="background:#F5C842"></div></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="w-full border-t border-rule py-3 text-[12px] font-bold text-ink uppercase tracking-widest">
+          View All 8 Spots
+        </button>
+      </section>
+
+      <!-- WIND & GUST CHART -->
+      <section class="px-4 py-4 bg-bg">
+        <div class="card p-4">
+          <div class="flex items-baseline justify-between">
+            <h3 class="text-[15px] font-bold text-ink tracking-tight">Wind &amp; Gusts</h3>
+            <span class="text-[11px] text-ink-mute">Next 24 hr</span>
+          </div>
+          <div class="relative h-28 mt-3">
+            <svg viewBox="0 0 320 110" preserveAspectRatio="none" class="w-full h-full">
+              <defs>
+                <linearGradient id="windgrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1DBF73" stop-opacity="0.30"/>
+                  <stop offset="100%" stop-color="#1DBF73" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="gustgrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#F49635" stop-opacity="0.22"/>
+                  <stop offset="100%" stop-color="#F49635" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="20" x2="320" y2="20" stroke="#F1F3F5" stroke-dasharray="3 4"/>
+              <line x1="0" y1="55" x2="320" y2="55" stroke="#F1F3F5" stroke-dasharray="3 4"/>
+              <line x1="0" y1="90" x2="320" y2="90" stroke="#F1F3F5" stroke-dasharray="3 4"/>
+              <path d="M0,85 L20,82 L40,78 L60,72 L80,60 L100,42 L120,30 L140,22 L160,18 L180,28 L200,40 L220,58 L240,72 L260,78 L280,75 L300,68 L320,60 L320,110 L0,110 Z"
+                    fill="url(#gustgrad)"/>
+              <path d="M0,85 L20,82 L40,78 L60,72 L80,60 L100,42 L120,30 L140,22 L160,18 L180,28 L200,40 L220,58 L240,72 L260,78 L280,75 L300,68 L320,60"
+                    fill="none" stroke="#F49635" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M0,92 L20,90 L40,87 L60,82 L80,72 L100,58 L120,48 L140,40 L160,36 L180,46 L200,56 L220,70 L240,82 L260,86 L280,84 L300,78 L320,72 L320,110 L0,110 Z"
+                    fill="url(#windgrad)"/>
+              <path d="M0,92 L20,90 L40,87 L60,82 L80,72 L100,58 L120,48 L140,40 L160,36 L180,46 L200,56 L220,70 L240,82 L260,86 L280,84 L300,78 L320,72"
+                    fill="none" stroke="#1DBF73" stroke-width="2" stroke-linejoin="round"/>
+              <line x1="30" y1="0" x2="30" y2="110" stroke="#0E1116" stroke-width="1.2" stroke-dasharray="2 3"/>
+              <text x="34" y="11" fill="#0E1116" font-size="9" font-weight="700" font-family="Helvetica Neue, sans-serif">NOW</text>
+            </svg>
+          </div>
+          <div class="flex items-center justify-between mt-2 text-[10px] text-ink-mute font-bold tracking-widest">
+            <span>6A</span><span>9A</span><span>12P</span><span>3P</span><span>6P</span><span>9P</span><span>12A</span>
+          </div>
+          <div class="flex items-center gap-4 mt-3 text-[11px]">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-0.5" style="background:#1DBF73"></span>
+              <span class="text-ink-soft">Sustained</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-0.5" style="background:#F49635"></span>
+              <span class="text-ink-soft">Gusts</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- IDEAL CONDITIONS (Surfline Guide-page-style) -->
+      <section class="px-4 py-4 bg-bg">
+        <div class="flex items-start gap-3 mb-3">
+          <div class="y-bar" style="min-height:32px"></div>
+          <h3 class="text-lg font-bold text-ink tracking-tight">Tucker Tower Spot Guide</h3>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="card p-3 flex items-start gap-2.5">
+            <div class="w-9 h-9 rounded-full bg-rule-2 grid place-items-center shrink-0">
+              <svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l5 5"/></svg>
+            </div>
+            <div>
+              <div class="label-cap">Ideal Wind</div>
+              <div class="text-[13px] font-bold text-ink mt-0.5">W to SW, &lt; 6 mph</div>
+            </div>
+          </div>
+          <div class="card p-3 flex items-start gap-2.5">
+            <div class="w-9 h-9 rounded-full bg-rule-2 grid place-items-center shrink-0">
+              <svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/></svg>
+            </div>
+            <div>
+              <div class="label-cap">Fetch</div>
+              <div class="text-[13px] font-bold text-ink mt-0.5">Short, 180 yd open</div>
+            </div>
+          </div>
+          <div class="card p-3 flex items-start gap-2.5">
+            <div class="w-9 h-9 rounded-full bg-rule-2 grid place-items-center shrink-0">
+              <svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12c2-3 6-3 8 0s6 3 8 0"/><path d="M5 18c2-3 6-3 8 0s6 3 8 0"/></svg>
+            </div>
+            <div>
+              <div class="label-cap">Glass Window</div>
+              <div class="text-[13px] font-bold text-ink mt-0.5">Dawn + dusk best</div>
+            </div>
+          </div>
+          <div class="card p-3 flex items-start gap-2.5">
+            <div class="w-9 h-9 rounded-full bg-rule-2 grid place-items-center shrink-0">
+              <svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M5 19l4-4M15 9l4-4"/></svg>
+            </div>
+            <div>
+              <div class="label-cap">Depth</div>
+              <div class="text-[13px] font-bold text-ink mt-0.5">25–40 ft, deep</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MAP -->
+      <section class="bg-card border-y border-rule">
+        <div class="px-4 pt-4 pb-2 flex items-baseline justify-between">
+          <h3 class="text-[15px] font-bold text-ink tracking-tight">Lake Murray Map</h3>
+          <div class="text-[11px] text-ink-mute">Wind 4 mph SW</div>
+        </div>
+        <div class="w-full h-[240px] relative" style="background:#D6CDB6;filter:sepia(0.25) saturate(0.9);">
+          <!-- Sepia/desat satellite vibe like Surfline's spot-guide maps -->
+          <svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" class="absolute inset-0 w-full h-full">
+            <rect width="400" height="240" fill="#B8A988"/>
+            <path d="M0,0 L400,0 L400,60 C 340,72 300,42 260,70 C 220,100 180,60 130,90 C 80,120 40,80 0,100 Z" fill="#3B2E20" opacity="0.55"/>
+            <path d="M0,240 L400,240 L400,170 C 350,180 320,210 280,200 C 240,190 220,220 180,210 C 140,200 100,230 60,220 C 30,213 10,225 0,220 Z" fill="#3B2E20" opacity="0.55"/>
+            <path d="M0,100 C 40,80 80,120 130,90 C 180,60 220,100 260,70 C 300,42 340,72 400,60 L400,170 C 350,180 320,210 280,200 C 240,190 220,220 180,210 C 140,200 100,230 60,220 C 30,213 10,225 0,220 Z"
+                  fill="#1E3A4A" opacity="0.78"/>
+          </svg>
+          <!-- Cyan/teal Surfline-style pin at Tucker -->
+          <div class="absolute" style="left:64%;top:42%;">
+            <svg class="w-8 h-8 -translate-x-1/2 -translate-y-full" viewBox="0 0 32 32">
+              <path d="M16 0 C 8 0 2 6 2 14 c 0 9 14 18 14 18 s 14 -9 14 -18 c 0 -8 -6 -14 -14 -14 Z" fill="#FFFFFF"/>
+              <circle cx="16" cy="14" r="6" fill="#22D3EE"/>
+            </svg>
+          </div>
+          <!-- score chips for nearby spots -->
+          <div class="absolute" style="left:24%;top:38%;"><div class="rounded-full text-white text-[10px] font-bold grid place-items-center" style="width:24px;height:24px;background:#1DBF73;border:2px solid #FAFAFA;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">71</div></div>
+          <div class="absolute" style="left:74%;top:30%;"><div class="rounded-full text-white text-[10px] font-bold grid place-items-center" style="width:24px;height:24px;background:#84B33B;border:2px solid #FAFAFA;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">66</div></div>
+          <div class="absolute" style="left:80%;top:22%;"><div class="rounded-full text-white text-[10px] font-bold grid place-items-center" style="width:24px;height:24px;background:#84B33B;border:2px solid #FAFAFA;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">62</div></div>
+          <div class="absolute" style="left:38%;top:24%;"><div class="rounded-full text-white text-[10px] font-bold grid place-items-center" style="width:24px;height:24px;background:#84B33B;border:2px solid #FAFAFA;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">58</div></div>
+          <div class="absolute" style="left:84%;top:62%;"><div class="rounded-full text-white text-[10px] font-bold grid place-items-center" style="width:24px;height:24px;background:#F5C842;border:2px solid #FAFAFA;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">52</div></div>
+          <div class="absolute" style="left:14%;top:78%;"><div class="rounded-full text-white text-[10px] font-bold grid place-items-center" style="width:24px;height:24px;background:#F5C842;border:2px solid #FAFAFA;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">44</div></div>
+          <div class="absolute" style="left:52%;top:14%;"><div class="rounded-full text-white text-[10px] font-bold grid place-items-center" style="width:24px;height:24px;background:#F49635;border:2px solid #FAFAFA;box-shadow:0 2px 6px rgba(0,0,0,0.4);font-variant-numeric:tabular-nums;">37</div></div>
+
+          <div class="absolute left-1/2 -translate-x-1/2 bottom-3">
+            <button class="rounded-full bg-white shadow-md px-4 py-2 text-[12px] font-bold text-ink whitespace-nowrap">View on Google Maps</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MOON / BITE -->
+      <section class="px-4 py-4 bg-bg">
+        <div class="flex items-start gap-3 mb-3">
+          <div class="y-bar" style="min-height:32px"></div>
+          <div class="flex-1">
+            <h3 class="text-lg font-bold text-ink tracking-tight">Moon &amp; Bite</h3>
+            <div class="text-[12px] text-ink-mute">Solunar fishing windows</div>
+          </div>
+          <button class="rounded-full border border-rule bg-card text-[11px] font-bold text-ink px-3 py-1.5">Fish view →</button>
+        </div>
+        <div class="card p-4">
+          <div class="flex items-center gap-3">
+            <svg width="42" height="42" viewBox="0 0 40 40" aria-hidden>
+              <circle cx="20" cy="20" r="20" fill="#0E1116"/>
+              <path d="M 20 0 a 20 20 0 1 1 0 40 a 13 20 0 1 0 0 -40" fill="#FAFAFA"/>
+            </svg>
+            <div class="flex-1">
+              <div class="text-base font-bold text-ink">Waxing Gibbous</div>
+              <div class="text-[12px] text-ink-soft mt-0.5">76% illuminated · moonrise 2:18p</div>
+            </div>
+          </div>
+          <div class="mt-3 grid grid-cols-2 gap-3">
+            <div class="border border-rule rounded-lg p-3">
+              <div class="label-cap">Major</div>
+              <div class="text-ink num font-bold mt-1 text-[13px]">8:50a – 10:50a</div>
+              <div class="text-ink-soft num text-[12px]">9:20p – 11:20p</div>
+            </div>
+            <div class="border border-rule rounded-lg p-3">
+              <div class="label-cap">Minor</div>
+              <div class="text-ink num font-bold mt-1 text-[13px]">1:48p – 2:48p</div>
+              <div class="text-ink-soft num text-[12px]">3:12a – 4:12a</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PREMIUM UPSELL -->
+      <section class="px-4 py-3 bg-bg">
+        <button class="card w-full px-4 py-3 flex items-center justify-between">
+          <span class="text-[12px] text-ink-soft">Unlock 16-day glass forecast &amp; storm alerts.</span>
+          <span class="rounded-full bg-ink text-white text-[11px] font-bold px-3 py-1.5">Go Premium</span>
+        </button>
+      </section>
+
+      <!-- BOTTOM NAV -->
+      <nav class="sticky bottom-0 bg-card border-t border-rule" style="padding-bottom: max(env(safe-area-inset-bottom), 8px);">
+        <ul class="grid grid-cols-4">
+          <li>
+            <button class="w-full py-2 flex flex-col items-center gap-1 text-ink" aria-current="page">
+              <span class="w-6 h-6 block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 14c3-3 5-3 8 0s5 3 8 0"/>
+                  <path d="M3 19c3-3 5-3 8 0s5 3 8 0"/>
+                </svg>
+              </span>
+              <span class="text-[10px] uppercase tracking-widest font-bold">Surf</span>
+            </button>
+          </li>
+          <li>
+            <button class="w-full py-2 flex flex-col items-center gap-1 text-ink-mute">
+              <span class="w-6 h-6 block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12c4-6 12-6 16 0-4 6-12 6-16 0Z"/>
+                  <path d="M19 12l3-3v6l-3-3Z"/>
+                  <circle cx="9" cy="11" r="0.6" fill="currentColor"/>
+                </svg>
+              </span>
+              <span class="text-[10px] uppercase tracking-widest font-bold">Fish</span>
+            </button>
+          </li>
+          <li>
+            <button class="w-full py-2 flex flex-col items-center gap-1 text-ink-mute">
+              <span class="w-6 h-6 block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2V6Z"/>
+                  <path d="M9 4v16M15 6v16"/>
+                </svg>
+              </span>
+              <span class="text-[10px] uppercase tracking-widest font-bold">Map</span>
+            </button>
+          </li>
+          <li>
+            <button class="w-full py-2 flex flex-col items-center gap-1 text-ink-mute">
+              <span class="w-6 h-6 block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 4h12v17l-6-4-6 4V4Z"/>
+                </svg>
+              </span>
+              <span class="text-[10px] uppercase tracking-widest font-bold">Saved</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+    </div>
+  </div>
+</body>
+</html>
